@@ -2,22 +2,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class DragDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
     private RectTransform rectTransform;
     private CanvasGroup canvasGroup;
-    private Vector3 defaultPos;
+
 
     // Onslot is to make sure that the dropped object is placed on an Item Slot
+    [HideInInspector] public Vector3 defaultPos;
     [HideInInspector] public bool onSlot;
     [SerializeField] private Canvas canvas;
+    [SerializeField] private GameObject itemText;
 
     private void Awake()
+    {
+        
+    }
+    public void Start()
     {
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
         defaultPos = rectTransform.localPosition;
+        if (canvas == null)
+        {
+            canvas = FindObjectOfType<Canvas>();
+        }
     }
     public void OnBeginDrag(PointerEventData eventData)
     {
@@ -49,7 +60,14 @@ public class DragDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
     {
         
     }
+    public void OnMouseOver()
+    {
+        itemText.SetActive(true);
+    }
+    public void OnMouseExit()
+    {
+        itemText.SetActive(false);
+    }
 
-  
 }
 
