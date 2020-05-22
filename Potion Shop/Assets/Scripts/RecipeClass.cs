@@ -8,9 +8,6 @@ public class RecipeClass : ScriptableObject
   public List<IngredientClass> Ingredients;
   public GameObject Potion;
     
-  public void Sort()
-    {
-
-    }
+ 
  
 }

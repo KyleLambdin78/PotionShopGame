@@ -13,15 +13,15 @@ public class DragDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
     // Onslot is to make sure that the dropped object is placed on an Item Slot
     [HideInInspector] public Vector3 defaultPos;
     [HideInInspector] public bool onSlot;
+    [HideInInspector] public GameObject itemSlot;
+    private BoxCollider2D box;
     [SerializeField] private Canvas canvas;
     [SerializeField] private GameObject itemText;
 
-    private void Awake()
-    {
-        
-    }
+
     public void Start()
     {
+        box = GetComponent<BoxCollider2D>();
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
         defaultPos = rectTransform.localPosition;
@@ -32,9 +32,15 @@ public class DragDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
     }
     public void OnBeginDrag(PointerEventData eventData)
     {
+        box.enabled = false;
         canvasGroup.alpha = 0.6f;
         canvasGroup.blocksRaycasts = false;
         onSlot = false;
+        if(itemSlot != null)
+        {
+            itemSlot.GetComponent<ItemSlot>().RemoveItem();
+        }
+        itemSlot = null;
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -44,16 +50,14 @@ public class DragDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        box.enabled = true;
         canvasGroup.alpha = 1.0f;
         canvasGroup.blocksRaycasts = true;
         if (onSlot == false)
         {
             rectTransform.anchoredPosition = defaultPos;
         }
-        else
-        {
-            defaultPos = rectTransform.anchoredPosition;
-        }
+       
     }
 
     public void OnPointerDown(PointerEventData eventData)

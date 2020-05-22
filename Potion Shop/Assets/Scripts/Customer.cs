@@ -14,9 +14,10 @@ public class Customer : MonoBehaviour, IDropHandler
     public Text timerText;
     public PotionClass[] potionClass;
     private float startTime;
+    private float tipAmount;
     private PotionClass wantedPotion;
     private GameManager GameManager;
-    private enum State {ApproachingCounter, AtCounter, OrderPlaced, OrderReceived}
+    public enum State {ApproachingCounter, AtCounter, OrderPlaced, OrderReceived, InLine, AtPickup}
     State customerState = State.ApproachingCounter;
     void Start()
     {
@@ -27,7 +28,13 @@ public class Customer : MonoBehaviour, IDropHandler
         ResetCustomer();
         StartCoroutine(MoveRight());
     }
-
+    public void Update()
+    {
+        if (Input.GetKeyDown("space"))
+        {
+            CustomerServed();
+        }
+    }
     public void PickPotion()
     {
         wantedPotion = potionClass[Random.Range(0, potionClass.Length)];
@@ -42,26 +49,24 @@ public class Customer : MonoBehaviour, IDropHandler
             thoughtBubble.SetActive(false);
             customerState = State.OrderPlaced;
             StartCoroutine(MoveDown());
-        }
-        else if(customerState == State.OrderPlaced)
-        {
-            customerState = State.OrderReceived;
-            StartCoroutine(MoveDown());
-        }
-        
+        } 
     }
     IEnumerator MoveDown()
     {
         while (customerState == State.OrderPlaced || customerState == State.OrderReceived)
         {
-            RaycastHit2D rightHit = Physics2D.Raycast(detection.position, Vector2.down, distance);
-            if (rightHit.collider == false)
+            RaycastHit2D downHit = Physics2D.Raycast(detection.position, Vector2.down, distance);
+            if (downHit.collider == false)
             {
                 transform.Translate(Vector2.down * speed * Time.deltaTime);
             }
-            else if (rightHit.collider == true)
+            else if (downHit.collider == true)
             {
-                if(customerState == State.OrderPlaced)
+                if (downHit.collider.GetComponent<Customer>() != null)
+                {
+                    yield return new WaitForSeconds(1);
+                }
+                if (customerState == State.OrderPlaced)
                 {
                     StartCoroutine(MoveRight());
                     yield break;
@@ -90,7 +95,11 @@ public class Customer : MonoBehaviour, IDropHandler
             }
             else if (rightHit.collider == true)
             {
-                if(customerState == State.ApproachingCounter)
+                if (rightHit.collider.GetComponent<Customer>() != null)
+                {
+                    yield return new WaitForSeconds(1);
+                }
+                else if(customerState == State.ApproachingCounter)
                 {
                     customerState = State.AtCounter;
                     thoughtBubble.SetActive(true);
@@ -99,6 +108,7 @@ public class Customer : MonoBehaviour, IDropHandler
                 }
                 else if (customerState == State.OrderPlaced)
                 {
+                    customerState = State.AtPickup;
                     thoughtBubble.SetActive(true);
                     yield break;
                 }
@@ -123,17 +133,18 @@ public class Customer : MonoBehaviour, IDropHandler
     public void OnDrop(PointerEventData eventData)
     {
         GameObject givenPotion = eventData.pointerDrag;
-        if(givenPotion.GetComponent<PotionDisplay>().potion == wantedPotion && customerState == State.OrderPlaced)
+        if(givenPotion.GetComponent<PotionDisplay>().potion == wantedPotion && customerState == State.AtPickup)
         {
             customerState = State.OrderReceived;
-            GameManager.AddGold(100);
+            GameManager.AddGold(tipAmount);
             Destroy(givenPotion);
             StartCoroutine(MoveDown());
         }
-        else if(givenPotion.GetComponent<PotionDisplay>(). potion != wantedPotion && customerState == State.OrderPlaced)
+        else if(givenPotion.GetComponent<PotionDisplay>(). potion != wantedPotion && customerState == State.AtPickup)
         {
             Destroy(givenPotion);
-            Debug.Log("Wrong Potion");
+            tipAmount = 0;
+            GameManager.AddGold(tipAmount);
             StartCoroutine(MoveDown());
         }
        
@@ -161,14 +172,17 @@ public class Customer : MonoBehaviour, IDropHandler
             if(t < 10)
             {
                 timerText.color = Color.green;
+                tipAmount = 100;
             }
             else if(t > 10 && t < 20)
             {
                 timerText.color = Color.yellow;
+                tipAmount = 50;
             }
             else
             {
                 timerText.color = Color.red;
+                tipAmount = 25;
             }
             yield return null;
         }
