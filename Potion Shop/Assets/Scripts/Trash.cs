@@ -6,8 +6,10 @@ public class Trash : MonoBehaviour, IDropHandler
 {
     public void OnDrop(PointerEventData eventData)
     {
-        if(eventData.pointerDrag.GetComponent<PotionDisplay>() != null)
+        GameObject potion = eventData.pointerDrag;
+        if(potion.GetComponent<PotionDisplay>() != null)
         {
+            potion.GetComponent<DragDrop>().CallItemSlot();
             Destroy(eventData.pointerDrag);
         }
     }

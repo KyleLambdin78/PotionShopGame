@@ -36,11 +36,16 @@ public class DragDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
         canvasGroup.alpha = 0.6f;
         canvasGroup.blocksRaycasts = false;
         onSlot = false;
-        if(itemSlot != null)
+        if(GetComponent<IngredientDisplay>() != false && itemSlot != null)
         {
-            itemSlot.GetComponent<ItemSlot>().RemoveItem();
+            CallItemSlot();
         }
-        itemSlot = null;
+        /* if(itemSlot != null)
+         {
+             itemSlot.GetComponent<ItemSlot>().RemoveItem();
+         }
+         itemSlot = null;
+         */
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -56,6 +61,7 @@ public class DragDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
         if (onSlot == false)
         {
             rectTransform.anchoredPosition = defaultPos;
+            
         }
        
     }
@@ -71,6 +77,24 @@ public class DragDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
     public void OnMouseExit()
     {
         itemText.SetActive(false);
+    }
+    public void AssignItemSlot(GameObject newSlot)
+    {
+        if(itemSlot == null)
+        {
+            itemSlot = newSlot;
+        }
+        else if(newSlot != itemSlot)
+        {
+            CallItemSlot();
+            itemSlot = newSlot;
+        }
+      
+      
+    }
+    public void CallItemSlot()
+    {
+        itemSlot.GetComponent<ItemSlot>().RemoveItem();
     }
 
 }

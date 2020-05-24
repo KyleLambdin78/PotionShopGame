@@ -24,16 +24,19 @@ public class ItemSlot : MonoBehaviour, IDropHandler
         if (eventData.pointerDrag != null && hasItem == false)
         {
             currentItem = eventData.pointerDrag;
-            currentItem.GetComponent<DragDrop>().onSlot = true;
-            currentItem.GetComponent<DragDrop>().itemSlot = this.gameObject;
+            DragDrop dragDrop = currentItem.GetComponent<DragDrop>();
+            dragDrop.onSlot = true;
             currentItem.GetComponent<RectTransform>().anchoredPosition = GetComponent<RectTransform>().anchoredPosition;
             hasItem = true;
+            dragDrop.AssignItemSlot(this.gameObject);
             if (CombineItems != null && currentItem.GetComponent<IngredientDisplay>() != null)    
             {
                 CombineItems.CreateItem(currentItem.GetComponent<IngredientDisplay>().ingredient);
             }
             
         }
+
+  
     }
     public void ClearItems()
     {
@@ -41,6 +44,7 @@ public class ItemSlot : MonoBehaviour, IDropHandler
         currentItem.GetComponent<DragDrop>().itemSlot = null;
         currentItem = null;
         hasItem = false;
+        
     }
     public void RemoveItem()
     {

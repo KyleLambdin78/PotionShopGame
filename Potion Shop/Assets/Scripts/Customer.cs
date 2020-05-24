@@ -16,14 +16,14 @@ public class Customer : MonoBehaviour, IDropHandler
     private float startTime;
     private float tipAmount;
     private PotionClass wantedPotion;
-    private GameManager GameManager;
+    private StoreManager StoreManager;
     public enum State {ApproachingCounter, AtCounter, OrderPlaced, OrderReceived, InLine, AtPickup}
     State customerState = State.ApproachingCounter;
     void Start()
     {
         timerText.enabled = false;
         startTime = 0;
-        GameManager = FindObjectOfType<GameManager>();
+        StoreManager = FindObjectOfType<StoreManager>();
         defPosition = this.transform.position;
         ResetCustomer();
         StartCoroutine(MoveRight());
@@ -43,7 +43,7 @@ public class Customer : MonoBehaviour, IDropHandler
     }
     public void CustomerServed()
     {
-        GameManager.CreateCustomers();
+        StoreManager.CreateCustomers();
         if(customerState == State.AtCounter)
         {
             thoughtBubble.SetActive(false);
@@ -133,22 +133,28 @@ public class Customer : MonoBehaviour, IDropHandler
     public void OnDrop(PointerEventData eventData)
     {
         GameObject givenPotion = eventData.pointerDrag;
+        DragDrop potionDrop = givenPotion.GetComponent<DragDrop>();
         if(givenPotion.GetComponent<PotionDisplay>().potion == wantedPotion && customerState == State.AtPickup)
         {
             customerState = State.OrderReceived;
-            GameManager.AddGold(tipAmount);
+            StoreManager.AddGold(tipAmount);
+            StoreManager.PromoteStars();
+            potionDrop.CallItemSlot();
             Destroy(givenPotion);
             StartCoroutine(MoveDown());
         }
-        else if(givenPotion.GetComponent<PotionDisplay>(). potion != wantedPotion && customerState == State.AtPickup)
+        else if(givenPotion.GetComponent<PotionDisplay>().potion != wantedPotion && customerState == State.AtPickup)
         {
+            customerState = State.OrderReceived;
+            StoreManager.DemoteStars();
+            potionDrop.CallItemSlot();
             Destroy(givenPotion);
             tipAmount = 0;
-            GameManager.AddGold(tipAmount);
+            StoreManager.AddGold(tipAmount);
             StartCoroutine(MoveDown());
         }
-       
-      
+        
+
     }
     public IEnumerator Timer()
     {
