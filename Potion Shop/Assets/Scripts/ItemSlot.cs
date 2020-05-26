@@ -42,6 +42,7 @@ public class ItemSlot : MonoBehaviour, IDropHandler
     {
         currentItem.GetComponent<RectTransform>().anchoredPosition = currentItem.GetComponent<DragDrop>().defaultPos;
         currentItem.GetComponent<DragDrop>().itemSlot = null;
+        currentItem.GetComponent<IngredientDisplay>().DecrementItemAmount();
         currentItem = null;
         hasItem = false;
         
