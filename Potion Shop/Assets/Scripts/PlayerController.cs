@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     public List<GameObject> hearts;
     public BoxCollider2D groundCheck;
     public GameObject resultScreen;
+    public ResultScreen resultScript;
     private Animator playerAnimation;
     private SpriteRenderer playerRenderer;
     private BoxCollider2D boxCollider;
@@ -106,10 +107,11 @@ public class PlayerController : MonoBehaviour
         rb.gravityScale = 0;
         boxCollider.enabled = false;
         resultScreen.SetActive(true);
+        resultScript.ShowResults();
         playerAnimation.SetBool("Dead", true);
         yield return new WaitForSeconds(1);
 
-        Destroy(this.gameObject);
+        this.gameObject.SetActive(false);
 
     }
     private void OnCollisionEnter2D(Collision2D collision)
@@ -138,7 +140,15 @@ public class PlayerController : MonoBehaviour
             Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPos.position, attackRange, enemiesOnly);
             for (int i = 0; i < enemiesToDamage.Length; i++)
             {
-                enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage();
+                if(enemiesToDamage[i].GetComponent<EnemyController>() != null)
+                {
+                    enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage();
+                }
+                else if(enemiesToDamage[i].GetComponent<Projectile>() != null)
+                {
+                    Destroy(enemiesToDamage[i].gameObject);
+                }
+                
             }
             timeBTWATK = startTimeBTWATK;
         }

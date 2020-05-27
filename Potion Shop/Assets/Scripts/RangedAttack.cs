@@ -8,6 +8,7 @@ public class RangedAttack : MonoBehaviour
     public float startTimeBTWShots;
     public GameObject projectile;
     public float offset;
+    public float shotDistance;
     public Transform shotPoint;
     private Transform player;
     void Start()
@@ -19,21 +20,25 @@ public class RangedAttack : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(player != null)
+        if (Vector3.Distance(transform.position, player.position) < shotDistance)
         {
-            Vector3 difference = player.position - transform.position;
-            float rotZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0f, 0f, rotZ);
-            shotPoint.rotation = transform.rotation;
-            if (timeBTWShots <= 0)
+            if (player != null)
             {
-                Instantiate(projectile, shotPoint.position, Quaternion.Euler(0f, 0f, transform.rotation.eulerAngles.z + offset));
-                timeBTWShots = startTimeBTWShots;
+                Vector3 difference = player.position - transform.position;
+                float rotZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
+                transform.rotation = Quaternion.Euler(0f, 0f, rotZ);
+                shotPoint.rotation = transform.rotation;
+                if (timeBTWShots <= 0)
+                {
+                    Instantiate(projectile, shotPoint.position, Quaternion.Euler(0f, 0f, transform.rotation.eulerAngles.z + offset));
+                    timeBTWShots = startTimeBTWShots;
+                }
+                else
+                {
+                    timeBTWShots -= Time.deltaTime;
+                }
             }
-            else
-            {
-                timeBTWShots -= Time.deltaTime;
-            }
+       
         }
        
 

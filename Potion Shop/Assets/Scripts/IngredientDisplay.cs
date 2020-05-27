@@ -16,6 +16,7 @@ public class IngredientDisplay : MonoBehaviour
     void Start()
     {
         itemAmount = PlayerPrefs.GetInt(ingredient.ingredientName, defaultAmount);
+        itemAmountText.text = itemAmount.ToString();
         ingredientText.text = ingredient.ingredientName;
         image.sprite = ingredient.ingredientSprite;
     }
@@ -31,7 +32,9 @@ public class IngredientDisplay : MonoBehaviour
     }
     public void DecrementItemAmount()
     {
+
         itemAmount -= 1;
+        itemAmountText.text = itemAmount.ToString();
         PlayerPrefs.SetInt(ingredient.ingredientName, itemAmount);
     }
 }

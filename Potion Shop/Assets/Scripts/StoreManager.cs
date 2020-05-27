@@ -7,27 +7,31 @@ public class StoreManager : MonoBehaviour
 {
     public GameObject spawnSpot;
     public GameObject customer;
-
     public Canvas canvas;
 
     public Text goldText;
     public Text customerCountText;
     public Text timerText;
-
+    public Text customersServed;
+    public Text gameOverText;
+    public Text goldEarned;
     public float goldAmount = 0;
     public float startTime = 60;
     private float positiveCustomers;
-
+    private float totalCustomers;
     public List<GameObject> stars;
     private List<GameObject> currentCustomers = new List<GameObject>();
 
     public int customerCount = 3;
-
+    public GameObject resultScreen;
+    public GameObject gameOverScreen;
 
     void Start()
     {
+        Debug.Log("Customer");
         positiveCustomers = 0;
         StartCoroutine(LevelTimer());
+        goldAmount = PlayerPrefs.GetFloat("Gold", 0);
         goldText.text = "Gold:" + goldAmount;
         CreateCustomers();
     }
@@ -64,6 +68,7 @@ public class StoreManager : MonoBehaviour
     public void DemoteStars()
     {
         positiveCustomers = 0;
+        totalCustomers += 1;
         customerCountText.text = positiveCustomers.ToString();
         List<GameObject> activeStars = new List<GameObject>();
        for(int i = 0; i < stars.Count; i++)
@@ -82,6 +87,7 @@ public class StoreManager : MonoBehaviour
     public void PromoteStars()
     {
         positiveCustomers += 1;
+        totalCustomers += 1;
         customerCountText.text = positiveCustomers.ToString();
         if(positiveCustomers % 10 == 0)
         {
@@ -103,12 +109,18 @@ public class StoreManager : MonoBehaviour
     }
     public void GameOver()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        gameOverScreen.SetActive(true);
+        goldEarned.text = "Gold Earned:" + goldAmount.ToString();
+        StopAllCoroutines();
+        foreach (GameObject customer in currentCustomers)
+        {
+            Destroy(customer);
+        }
     }
     public IEnumerator LevelTimer()
     {
         float t = startTime;
-        while (t >= 0)
+        while (t > 0)
         {
             t = startTime - Time.timeSinceLevelLoad;
             string minutes = ((int)t / 60).ToString();
@@ -123,9 +135,22 @@ public class StoreManager : MonoBehaviour
             }
             yield return null;
         }
-       yield return new WaitForSeconds(1);
-       SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);   
+        timerText.text = "0";
+        TimesUp();
     }
-    
+    public void TimesUp()
+    {
+        resultScreen.SetActive(true);
+        customersServed.text = totalCustomers.ToString();
+        PlayerPrefs.SetFloat("Gold", goldAmount);
+        foreach (GameObject customer in currentCustomers)
+        {
+            Destroy(customer);
+        }
+    }
+    public void CombatScene()
+    {
+        SceneManager.LoadScene(1);
+    }
  
 }

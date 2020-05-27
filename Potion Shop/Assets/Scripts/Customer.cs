@@ -43,9 +43,9 @@ public class Customer : MonoBehaviour, IDropHandler
     }
     public void CustomerServed()
     {
-        StoreManager.CreateCustomers();
         if(customerState == State.AtCounter)
         {
+            StoreManager.CreateCustomers();
             thoughtBubble.SetActive(false);
             customerState = State.OrderPlaced;
             StartCoroutine(MoveDown());
@@ -180,15 +180,24 @@ public class Customer : MonoBehaviour, IDropHandler
                 timerText.color = Color.green;
                 tipAmount = 100;
             }
-            else if(t > 10 && t < 20)
+            else if(t > 10 && t < 15)
             {
                 timerText.color = Color.yellow;
                 tipAmount = 50;
             }
-            else
+            else if (t > 15 && t < 20)
             {
                 timerText.color = Color.red;
                 tipAmount = 25;
+            }
+            else
+            {
+                this.transform.position = defPosition;
+                ResetCustomer();
+                RestartCustomer();
+                StoreManager.DemoteStars();
+                timerText.enabled = false;
+                yield break;
             }
             yield return null;
         }

@@ -8,11 +8,10 @@ public class Patrol : MonoBehaviour
     public float distance;
     public Transform groundDetection;
     private bool movingRight = true;
-    private LayerMask wallMask;
+    public LayerMask wallMask;
 
     private void Start()
     {
-        wallMask = LayerMask.GetMask("wall");
         StartCoroutine(PatrolArea());
     }
     void Update()

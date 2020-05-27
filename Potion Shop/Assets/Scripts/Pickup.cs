@@ -11,7 +11,7 @@ public class Pickup : MonoBehaviour
     {
         itemSprite = GetComponent<SpriteRenderer>();
         itemSprite.sprite = ingredientClass.ingredientSprite;
-        itemCount = PlayerPrefs.GetInt(ingredientClass.ingredientName, 0);
+        itemCount = PlayerPrefs.GetInt(ingredientClass.ingredientName, 20);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
